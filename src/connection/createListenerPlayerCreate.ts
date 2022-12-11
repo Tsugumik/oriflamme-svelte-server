@@ -6,9 +6,7 @@ import emitError from '../errorHandler/emitError';
 import Player from '../entities/Player';
 import { SOCKET_ON } from '../utils/SOCKET_ON';
 import emitConnectionAccept from "./emitConnectionAccept";
-import { PlayersObject } from '../types/PlayersObject';
 import getPlayerFromId from '../utils/getPlayerFromId';
-import playerExist from '../utils/playerExist';
 import GameInstance from '../game/GameInstance';
 
 export default async function createListenerPlayerCreate(socket: Socket, playersArray: Array<Player>, gameInstace: GameInstance) {

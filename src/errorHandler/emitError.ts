@@ -1,21 +1,14 @@
 import { Socket } from 'socket.io';
 import { CreatePlayerClientResponseObject } from '../types/CreatePlayerClientResponseObject';
 import { ErrorPacket } from '../types/ErrorPacket';
+import { ErrorMessages } from './errorMessages';
 import { ServerError } from './ServerError';
 
-export default async function emitError(socket: Socket, error: ServerError, PLAYER_CREATE_OBJECT?: CreatePlayerClientResponseObject) {
+export default async function emitError(socket: Socket, error: ServerError) {
     let error_message = "";
 
-    if (error == ServerError.WRONG_USERNAME) {
-        error_message = `Socket ${socket.id} username ${PLAYER_CREATE_OBJECT?.name} is not releated to the id ${PLAYER_CREATE_OBJECT?.id}`;
-    } else if (error == ServerError.EMPTY_ID) {
-        error_message = `The client did not provide a player id`;
-    } else if (error == ServerError.PLAYER_ALREADY_CONNECTED) {
-        error_message = `Player with given details is already connected`
-    } else if (error == ServerError.WRONG_ID) {
-        error_message = `Provided player id does not exist in memory`
-    } else if (error == ServerError.TOO_LONG_CHAT_MESSAGE) {
-        error_message = `Socket tried to send a message longer than allowed`
+    if(ErrorMessages[error]) {
+        error_message = ErrorMessages[error];
     } else {
         error_message = `There is no message for this error code`;
     }

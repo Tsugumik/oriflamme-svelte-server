@@ -7,6 +7,9 @@ import createListenerPlayerCreate from './connection/createListenerPlayerCreate'
 import createListenerDisconnect from './connection/createListenerDisconnect';
 import * as dotenv from "dotenv";
 import GameInstance from './game/GameInstance';
+import { ApiErrorMessages } from './errorHandler/ApiErrorMessages';
+import { ApiErrors } from './errorHandler/apiErrors';
+import createListenerRequestPlayerSync from './connection/createListenerRequestPlayerSync';
 
 dotenv.config();
 
@@ -31,25 +34,34 @@ app.get('/', (req, res)=>{
 });
 
 if(PUBLIC_API) {
-    app.get('/api/game', async (req, res)=>{
-        res.json(GAME);
+    app.get('/api/:gameId/', async (req, res)=>{
+        if(req.params.gameId == GAME.gameId) {
+            res.json(GAME);
+            
+        } else res.status(400).json({message: ApiErrorMessages[ApiErrors.INVALID_API_KEY]});
+        
     });
-    app.get('/api/game/players', async (req, res)=>{
-        res.json(GAME.players);
+    app.get('/api/:gameId/players', async (req, res)=>{
+        if(req.params.gameId == GAME.gameId) {
+            res.json(GAME.players);
+        } else res.status(400).json({message: ApiErrorMessages[ApiErrors.INVALID_API_KEY]});
+        
     });
-    app.get('/api/game/chat', async (req, res)=>{
-        res.json(GAME.chat);
+    app.get('/api/:gameId/chat', async (req, res)=>{
+        if(req.params.gameId == GAME.gameId) {
+            res.json(GAME.chat);
+        } else res.status(400).json({message: ApiErrorMessages[ApiErrors.INVALID_API_KEY]});
     });
-    
 }
 
 // Start server
 io.on("connection", socket=>{
     console.log(`${socket.id} connected!`);
-    createListenerPlayerCreate(socket, GAME.players, GAME);
-    createListenerDisconnect(socket, GAME.players, GAME.gameState);
+    createListenerPlayerCreate(socket, GAME.players, GAME, io);
+    createListenerDisconnect(socket, GAME.players, GAME.gameState, io);
     createListenerNewChatMessage(socket, GAME.players, GAME.chat, io);
     createListenerSyncChat(socket, GAME.chat);
+    createListenerRequestPlayerSync(io, GAME.players);
 });
 
 server.listen(PORT, ()=>{

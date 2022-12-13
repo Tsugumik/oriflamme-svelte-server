@@ -1,3 +1,6 @@
 export enum ApiErrors {
-    INVALID_API_KEY
+    INVALID_API_KEY,
+    INVALID_SOCKET_ID,
+    VALIDATION_ERROR,
+    INVALID_ADMIN_KEY
 };

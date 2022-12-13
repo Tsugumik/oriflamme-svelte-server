@@ -19,7 +19,7 @@ export default class GameInstance {
         this.table = new Table();
         this.chat = new Array<MessagePacket>;
         this.gameState = GameState.LOBBY;
-        this.gameId = crypto.randomUUID();
+        this.gameId = "123";//crypto.randomUUID();
     }
 
     public async init() {

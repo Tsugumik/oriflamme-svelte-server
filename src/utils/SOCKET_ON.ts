@@ -5,3 +5,7 @@ export const SOCKET_ON = {
     CHAT_SYNC: "chat-sync",
     REQUEST_PLAYER_SYNC: "request-player-sync"
 };
+
+export enum SocketListeners {
+
+}

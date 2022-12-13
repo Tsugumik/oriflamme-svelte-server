@@ -1,8 +1,8 @@
 import { Server, Socket } from 'socket.io';
 import Player from '../entities/Player';
 import { GameState } from '../game/GameState';
+import { SocketEmiters } from '../utils/SocketEmiters';
 import { SOCKET_ON } from '../utils/SOCKET_ON';
-import emitPlayerSync from './emitPlayerSync';
 
 export default async function createListenerDisconnect(socket: Socket, playersArray: Array<Player>, gameState: GameState, globalIoServer: Server) {
     socket.on(SOCKET_ON.DISCONNECT, async () => {
@@ -23,7 +23,7 @@ export default async function createListenerDisconnect(socket: Socket, playersAr
             console.log(`${socket.id} disconnected from the game!`);
         }
         
-        await emitPlayerSync(globalIoServer, playersArray);
+        globalIoServer.local.emit(SocketEmiters.LOBBY_SYNC);
 
     });
 

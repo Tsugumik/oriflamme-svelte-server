@@ -1,16 +1,34 @@
 import express from "express";
 import { Server } from "socket.io";
-import { PlayerSyncPacket } from "../entities/Player";
+import Player, { PlayerSyncPacket } from "../entities/Player";
+import { ApiErrorMessages } from "../errorHandler/ApiErrorMessages";
+import { ApiErrors } from "../errorHandler/apiErrors";
 import GameInstance from "../game/GameInstance";
-import adminAuth from "../middlewares/adminAuth";
+import auth from "../middlewares/auth";
+import { PlayerPermissions } from "../permisssions/PlayerPermissions";
+import getPlayerFromSocketId from "../utils/getPlayerFromSocketId";
+import { SocketEmiters } from "../utils/SocketEmiters";
 
 const adminRouter = express.Router();
 
 export default function admin(gameInstance: GameInstance, io: Server, adminKey: string) {
-    adminRouter.use(adminAuth(gameInstance, io, adminKey));
+    adminRouter.use(auth(gameInstance, io));
     
-    adminRouter.get('', async (req, res)=>{
-        res.json({});
+    adminRouter.get('/permission', async (req, res)=>{
+        const PLAYER: Player = await getPlayerFromSocketId(req.headers.authorization, gameInstance.players);
+        res.json(await PLAYER.getPermissionStatus());
     });
+
+    adminRouter.post('/permission', async(req, res)=>{
+        if(req.body.admin_key == adminKey) {
+            const PLAYER: Player = await getPlayerFromSocketId(req.headers.authorization, gameInstance.players);
+            PLAYER.permission = PlayerPermissions.ADMIN;
+            io.local.emit(SocketEmiters.PERMISSION_SYNC);
+            res.json(await PLAYER.getPermissionStatus());
+        } else {
+            res.status(401).json({error: ApiErrorMessages[ApiErrors.INVALID_ADMIN_KEY]});
+        }
+    });
+
     return adminRouter;
 }

@@ -8,15 +8,14 @@ import GameInstance from './game/GameInstance';
 import cors from "cors";
 import bodyParser from "body-parser";
 import chat from './api/chat';
-import auth from './middlewares/auth';
 import lobby from './api/lobby';
 import admin from './api/admin';
-import adminAuth from './middlewares/adminAuth';
+import settings from './api/settings';
+import game from './api/game';
 
 dotenv.config();
 
 const PORT:number = Number(process.env.port) || 3000;
-const PUBLIC_API: number = Number(process.env.public_api) || 0;
 const ADMIN_KEY: string = process.env.admin_key || "zaq1@WSX";
 
 const app = express();
@@ -40,12 +39,14 @@ app.get('/', (req, res)=>{
 app.use('/api/chat', chat(GAME, io));
 app.use('/api/lobby', lobby(GAME, io));
 app.use('/api/admin', admin(GAME, io, ADMIN_KEY));
+app.use('/api/settings', settings(GAME, io));
+app.use('/api/game', game(GAME, io));
 
 // Start server
 io.on("connection", socket=>{
     console.log(`${socket.id} connected!`);
     createListenerPlayerCreate(socket, GAME.players, GAME, io);
-    createListenerDisconnect(socket, GAME.players, GAME.gameState, io);
+    createListenerDisconnect(socket, GAME.players, GAME, io);
 });
 
 server.listen(PORT, ()=>{

@@ -6,22 +6,37 @@ import emitError from '../errorHandler/emitError';
 import Player from '../entities/Player';
 import { SOCKET_ON } from '../utils/SOCKET_ON';
 import emitConnectionAccept from "./emitConnectionAccept";
-import getPlayerFromId from '../utils/getPlayerFromId';
 import GameInstance from '../game/GameInstance';
 import { SocketEmiters } from '../utils/SocketEmiters';
+import { PlayerColor } from '../types/PlayerColor';
+import { GameState } from '../game/GameState';
+import getPlayerFromConnectionId from '../utils/getPlayerFromConnectionId';
 
 export default async function createListenerPlayerCreate(socket: Socket, playersArray: Array<Player>, gameInstace: GameInstance, globalIoServer: Server) {
     socket.on(SOCKET_ON.PLAYER_CREATE, async message => {
         if(gameInstace.players.length == gameInstace.MAX_PLAYERS) {
-            emitError(socket, ServerError.PLAYER_LIMIT_REACHED);
+            await emitError(socket, ServerError.PLAYER_LIMIT_REACHED);
             globalIoServer.local.emit(SocketEmiters.LOBBY_SYNC);
             return;
         }
+
         const PLAYER_CREATE_OBJECT: CreatePlayerClientResponseObject = JSON.parse(message);
+        
+        if(!PLAYER_CREATE_OBJECT) {
+            await emitError(socket, ServerError.CLIENT_CONNECTION_ERROR);
+            return;
+        }
+
         if (PLAYER_CREATE_OBJECT.id == "") {
+            if(gameInstace.gameState == GameState.PLAYING) {
+                await emitError(socket, ServerError.GAME_ALREADY_STARTED);
+                return;
+            }
             const GENERATED_PLAYER_ID = crypto.randomUUID();
-            playersArray.push(new Player(GENERATED_PLAYER_ID, PLAYER_CREATE_OBJECT.name, socket.id));
-            const PLAYER = await getPlayerFromId(playersArray, GENERATED_PLAYER_ID); 
+            const GENERATED_CONNECTION_ID = crypto.randomUUID();
+            const playerColor: PlayerColor = await gameInstace.getColor();
+            playersArray.push(new Player(GENERATED_PLAYER_ID, PLAYER_CREATE_OBJECT.name, socket.id, playerColor, GENERATED_CONNECTION_ID));
+            const PLAYER = await getPlayerFromConnectionId(playersArray, GENERATED_CONNECTION_ID); 
             PLAYER.connectionStatus = true;
             console.log(`Generated new Player object ${GENERATED_PLAYER_ID} for socket ${socket.id}`);
             await emitConnectionAccept(socket, PLAYER);
@@ -29,7 +44,7 @@ export default async function createListenerPlayerCreate(socket: Socket, players
             return;
         } else if (PLAYER_CREATE_OBJECT.id) {
             console.log(`${PLAYER_CREATE_OBJECT.id} trying to reconnect from socket ${socket.id}...`);
-            const PLAYER = await getPlayerFromId(playersArray, PLAYER_CREATE_OBJECT.id);
+            const PLAYER = await getPlayerFromConnectionId(playersArray, PLAYER_CREATE_OBJECT.id);
             if (PLAYER) {
                 if(PLAYER.connectionStatus) {
                     await emitError(socket, ServerError.PLAYER_ALREADY_CONNECTED);

@@ -1,5 +1,6 @@
 export type MessagePacket = {
-    sender: string;
-    message: string;
-    time: string;
+    sender: string,
+    senderid: string,
+    message: string,
+    time: string
 };

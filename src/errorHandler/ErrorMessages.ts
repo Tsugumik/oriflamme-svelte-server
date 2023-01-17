@@ -9,5 +9,7 @@ export const ErrorMessages: { [id in ServerError]: string} = {
     [ServerError.PLAYER_ALREADY_CONNECTED]: "Player with given details is already connected",
     [ServerError.ADMIN_KEY_ENV_NOT_EXIST]: "Admin key does not exist in the environment file",
     [ServerError.WRONG_ADMIN_KEY]: "Incorrect admin key",
-    [ServerError.PLAYER_LIMIT_REACHED]: "The maximum number of players in the lobby has been reached"
+    [ServerError.PLAYER_LIMIT_REACHED]: "The maximum number of players in the lobby has been reached",
+    [ServerError.REQUEST_PARSE_ERROR]: "Request parse error",
+    [ServerError.GAME_ALREADY_STARTED]: "Game alredy started"
 }

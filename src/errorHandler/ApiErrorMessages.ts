@@ -1,4 +1,4 @@
-import { ApiErrors } from "./apiErrors";
+import { ApiErrors } from "./ApiErrors";
 
 export const ApiErrorMessages: { [id in ApiErrors]: string } = {
     [ApiErrors.INVALID_API_KEY]: "Invalid API key",

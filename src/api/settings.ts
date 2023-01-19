@@ -1,7 +1,7 @@
 import express from "express";
 import { Server } from "socket.io";
 import { ApiErrorMessages } from "../errorHandler/ApiErrorMessages";
-import { ApiErrors } from "../errorHandler/apiErrors";
+import { ApiErrors } from "../errorHandler/ApiErrors";
 import GameInstance from "../game/GameInstance";
 import adminPermission from "../middlewares/adminPermission";
 import { MessagePacket } from "../types/MessagePacket";

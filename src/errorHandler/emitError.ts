@@ -1,7 +1,7 @@
 import { Socket } from 'socket.io';
 import { CreatePlayerClientResponseObject } from '../types/CreatePlayerClientResponseObject';
 import { ErrorPacket } from '../types/ErrorPacket';
-import { ErrorMessages } from './errorMessages';
+import { ErrorMessages } from './ErrorMessages';
 import { ServerError } from './ServerError';
 
 export default async function emitError(socket: Socket, error: ServerError) {

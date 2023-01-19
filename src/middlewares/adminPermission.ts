@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { Server } from "socket.io";
 import { ApiErrorMessages } from "../errorHandler/ApiErrorMessages";
-import { ApiErrors } from "../errorHandler/apiErrors";
+import { ApiErrors } from "../errorHandler/ApiErrors";
 import GameInstance from "../game/GameInstance";
 import { PlayerPermissions } from "../permisssions/PlayerPermissions";
 import getPlayerFromSocketId from "../utils/getPlayerFromSocketId";

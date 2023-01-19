@@ -2,7 +2,7 @@ import express from "express";
 import { Server } from "socket.io";
 import Player from "../entities/Player";
 import { ApiErrorMessages } from "../errorHandler/ApiErrorMessages";
-import { ApiErrors } from "../errorHandler/apiErrors";
+import { ApiErrors } from "../errorHandler/ApiErrors";
 import GameInstance from "../game/GameInstance";
 import auth from "../middlewares/auth";
 import getPlayerFromSocketId from "../utils/getPlayerFromSocketId";

@@ -3,5 +3,6 @@ export enum SocketEmiters {
     LOBBY_SYNC = "lobby-sync",
     PERMISSION_SYNC = "permission_sync",
     GAME_INITIALIZED = "game_init",
-    SERVER_SOUND = "server_sound"
+    SERVER_SOUND = "server_sound",
+    CARDS_SYNC = "cards_sync",
 }

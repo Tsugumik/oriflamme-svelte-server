@@ -1,0 +1,1 @@
+export type TablePutObject = {id: number, slotIndex: number};

@@ -3,9 +3,15 @@ import { Server } from "socket.io";
 import Player from "../entities/Player";
 import { ApiErrorMessages } from "../errorHandler/ApiErrorMessages";
 import { ApiErrors } from "../errorHandler/ApiErrors";
+import { CardId } from "../game/CardId";
+import { CardsConstructors } from "../game/cardsConstructors";
 import GameInstance from "../game/GameInstance";
+import IGameEntity from "../interfaces/IGameEntity";
 import auth from "../middlewares/auth";
+import { TablePutObject } from "../types/TablePutObject";
 import getPlayerFromSocketId from "../utils/getPlayerFromSocketId";
+import isCardInPlayerHand from "../utils/isCardInPlayerHand";
+import { SocketEmiters } from "../utils/SocketEmiters";
 
 const gameRouter = express.Router();
 
@@ -41,6 +47,30 @@ export default function game(gameInstance: GameInstance, io: Server) {
         const PLAYER = await getPlayerFromSocketId(req.headers.authorization, gameInstance.players);
         if(PLAYER == gameInstance.activePlayer) {
             // TODO: Trza zrobić logikę wkładania karty na stół
+            const DATA: TablePutObject = await req.body;
+            const cardId: CardId = DATA.id;
+            const ownerShip = await isCardInPlayerHand(cardId, PLAYER);
+            if(ownerShip) {
+                PLAYER.hand = PLAYER.hand.filter(card => {
+                    return card.id != cardId;
+                });
+                let new_table = Array<IGameEntity>();
+                if(gameInstance.table.length > 0 && DATA.slotIndex < gameInstance.table.length) {
+                    for(let i=0; i<gameInstance.table.length; i++) {
+                        if(DATA.slotIndex == i) {
+                            new_table.push(new CardsConstructors[cardId](PLAYER.id, PLAYER.color));
+                            new_table.push(gameInstance.table[i]);
+                        } else {
+                            new_table.push(gameInstance.table[i]);
+                        }
+                    }
+                } else {
+                    new_table = [...gameInstance.table, new CardsConstructors[cardId](PLAYER.id, PLAYER.color)];
+                }
+                
+                gameInstance.table = new_table;
+                io.local.emit(SocketEmiters.CARDS_SYNC);
+            }
             res.json({});
         } else {
             res.status(400).json({error: ApiErrorMessages[ApiErrors.NOTACTIVEPLAYER]});

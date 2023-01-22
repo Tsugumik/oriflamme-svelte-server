@@ -22,9 +22,11 @@ export default function settings(gameInstance: GameInstance, io: Server) {
         if(INIT_STATUS) {
             console.log("Game initialized!");
             io.local.emit(SocketEmiters.GAME_INITIALIZED);
+            io.local.emit(SocketEmiters.LOBBY_SYNC);
             await logToChat(gameInstance, io, "Game initialized!");
             res.json({status: "OK"});
         } else {
+            await logToChat(gameInstance, io, ApiErrorMessages[ApiErrors.INCORRECT_NUMBER_OF_PLAYERS], true);
             res.status(400).json({error: ApiErrorMessages[ApiErrors.INCORRECT_NUMBER_OF_PLAYERS]});
         }
     });

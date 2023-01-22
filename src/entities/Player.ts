@@ -23,6 +23,7 @@ export default class Player {
     permission: PlayerPermissions = PlayerPermissions.STANDARD;
     color: PlayerColor;
     hand: Array<IGameEntity>;
+    active: boolean;
     constructor(id: string, name: string, lastSocketId: string, color: PlayerColor, connectionId: string) {
         this.id = id;
         this.connectionId = connectionId;
@@ -30,6 +31,7 @@ export default class Player {
         this.lastSocketId = lastSocketId;
         this.color = color;
         this.hand = new Array<IGameEntity>();
+        this.active = false;
     }
 
     /* Returns information available to other players */
@@ -39,7 +41,8 @@ export default class Player {
             connectionStatus: this.connectionStatus,
             permission: this.permission,
             color: this.color,
-            id: this.id
+            id: this.id,
+            active: this.active
         };
     }
 
@@ -66,5 +69,5 @@ export default class Player {
     }
 }
 
-export type PlayerSyncPacket = {name: string, connectionStatus: boolean, permission: PlayerPermissions, color: PlayerColor, id: string};
+export type PlayerSyncPacket = {name: string, connectionStatus: boolean, permission: PlayerPermissions, color: PlayerColor, id: string, active: boolean};
 export type PlayerPermissionPacket = {status: PlayerPermissions};

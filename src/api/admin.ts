@@ -7,6 +7,7 @@ import GameInstance from "../game/GameInstance";
 import auth from "../middlewares/auth";
 import { PlayerPermissions } from "../permisssions/PlayerPermissions";
 import getPlayerFromSocketId from "../utils/getPlayerFromSocketId";
+import logToChat from "../utils/logToChat";
 import { SocketEmiters } from "../utils/SocketEmiters";
 
 const adminRouter = express.Router();
@@ -24,7 +25,7 @@ export default function admin(gameInstance: GameInstance, io: Server, adminKey: 
             const PLAYER: Player = await getPlayerFromSocketId(req.headers.authorization, gameInstance.players);
             PLAYER.permission = PlayerPermissions.ADMIN;
             io.local.emit(SocketEmiters.PERMISSION_SYNC);
-            res.json(await PLAYER.getPermissionStatus());
+            res.status(200).json(await PLAYER.getPermissionStatus());
         } else {
             res.status(401).json({error: ApiErrorMessages[ApiErrors.INVALID_ADMIN_KEY]});
         }

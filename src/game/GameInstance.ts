@@ -14,16 +14,12 @@ export default class GameInstance {
     public activePlayer?: Player;
     public gameState: GameState;
     public table: Array<IGameEntity>;
-    public MIN_PLAYERS = 3;
+    public MIN_PLAYERS = 1;
     public MAX_PLAYERS = 5;
     
     constructor() {
         this.players = new Array<Player>
-        this.table = new Array<IGameEntity>(
-            new Archer("1234", PlayerColor.GRAY),
-            new Spy("12345", PlayerColor.RED),
-            new Spy("123456", PlayerColor.YELLOW)
-        );
+        this.table = new Array<IGameEntity>();
         this.chat = new Array<MessagePacket>();
         this.gameState = GameState.LOBBY;
     }
@@ -34,6 +30,7 @@ export default class GameInstance {
         }
         if(this.players.length >= this.MIN_PLAYERS && this.players.length <= this.MAX_PLAYERS) {
             this.activePlayer = this.players[Math.floor(Math.random()*this.players.length)];
+            this.activePlayer.active = true;
             this.gameState = GameState.PLAYING;
 
             this.players.forEach(async player=>{
